@@ -1,0 +1,8 @@
+services:
+  dns:
+    image: goncharovmikhail/dns:first
+    container_name: dns
+    ports:
+      - "1053:53/udp"
+      - "1053:53/tcp"
+    privileged: true

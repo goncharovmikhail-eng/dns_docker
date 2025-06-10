@@ -1,0 +1,14 @@
+$TTL    604800  
+@       IN      SOA     ns.{{ zones_name }}. admin.{{ zones_name }}. (  
+                      2023032701 ; Serial  
+                      604800      ; Refresh  
+                      86400       ; Retry  
+                      2419200     ; Expire  
+                      604800 )    ; Negative Cache TTL  
+
+; Nameservers  
+@       IN      NS      ns.{{ zones_name }}.  
+
+; PTR Records  
+31      IN      PTR     mail.{{ zones_name }}.  
+32 IN PRT zabbix.{{ zones_name }}.
