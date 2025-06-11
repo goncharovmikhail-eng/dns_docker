@@ -6,43 +6,59 @@ from collections import defaultdict
 env = Environment(loader=FileSystemLoader('templates'))
 
 def ask(msg, default=None):
-    val = input(f"{msg} [{'Enter' if default else ''}]: ").strip()
+    suffix = f" [{default}]" if default else ""
+    val = input(f"{msg}{suffix}: ").strip()
     return val if val else default
 
 def reverse_ip(ip):
-    parts = ip.split('.')
-    return '.'.join(reversed(parts)) + '.in-addr.arpa'
+    return '.'.join(reversed(ip.split('.'))) + '.in-addr.arpa'
 
 def main():
     zone_name = ask("Введите имя зоны (example.com)")
     default_ip = ask("Введите IP по умолчанию", "192.168.1.1")
 
-    mail_enabled = ask("Нужна ли почта? (y/n)", "n").lower() == 'y'
-    mail_sub = dkim_key = ''
     records = []
-    ptr_records = defaultdict(str)
+    ptr_records = {}
     unique_ips = set()
+    added_names = set()
 
+    # Почта
+    mail_enabled = ask("Нужна ли почта? (y/n)", "n").lower() == 'y'
     if mail_enabled:
         mail_sub = ask("Введите поддомен для почты", "mail")
         dkim_key = ask("Введите публичный DKIM-ключ (или Enter, чтобы пропустить)", "")
-        records.append({'name': mail_sub, 'type': 'A', 'value': default_ip})
+
+        if mail_sub not in added_names:
+            records.append({'name': mail_sub, 'type': 'A', 'value': default_ip})
+            added_names.add(mail_sub)
+
         records.append({'name': '@', 'type': 'MX', 'value': f"10 {mail_sub}.{zone_name}."})
         records.append({'name': '@', 'type': 'TXT', 'value': '"v=spf1 +mx ~all"'})
         records.append({'name': '_dmarc', 'type': 'TXT', 'value': f'"v=DMARC1;p=none;rua=mailto:dmarc@{zone_name}"'})
-        records.append({'name': 'dkim._domainkey', 'type': 'TXT', 'value': f'"v=DKIM1; k=rsa; p={dkim_key}"' if dkim_key else '"v=DKIM1; k=rsa; p="'})
-        octet = ipaddress.IPv4Address(default_ip).reverse_pointer.split('.')[0]
-        ptr_records[octet] = f"{mail_sub}.{zone_name}."
+        records.append({
+            'name': 'dkim._domainkey',
+            'type': 'TXT',
+            'value': f'"v=DKIM1; k=rsa; p={dkim_key}"' if dkim_key else '"v=DKIM1; k=rsa; p="'
+        })
+
+        ptr_octet = default_ip.split('.')[-1]
+        ptr_records[ptr_octet] = f"{mail_sub}.{zone_name}."
         unique_ips.add(default_ip)
 
-    print("\nТеперь добавьте поддомены. Введите /q чтобы закончить.")
+    # Поддомены
+    print("\nТеперь добавьте поддомены. Введите 'q' чтобы закончить.")
     while True:
         name = input("> Поддомен (например, admin): ").strip()
-        if name == "/q":
+        if name.lower() == "q":
             break
+
+        if name in added_names:
+            print(f"⚠️ Поддомен '{name}' уже добавлен. Пропускаем.")
+            continue
 
         while True:
             ip = ask(f"IP для поддомена '{name}'", default_ip)
+            print(f"📌 Используется IP: {ip}")
             try:
                 ipaddress.IPv4Address(ip)
                 break
@@ -50,20 +66,24 @@ def main():
                 print(f"❌ '{ip}' не является корректным IPv4-адресом. Попробуйте снова.")
 
         records.append({'name': name, 'type': 'A', 'value': ip})
+        added_names.add(name)
         unique_ips.add(ip)
-        octet = ip.split('.')[-1]
-        ptr_records[octet] = f"{name}.{zone_name}."
+        ptr_records[ip.split('.')[-1]] = f"{name}.{zone_name}."
 
-    # Обязательные A и NS-записи
-    records.append({'name': '@', 'type': 'A', 'value': default_ip})
-    records.append({'name': 'ns', 'type': 'A', 'value': default_ip})
-    ptr_records[default_ip.split('.')[-1]] = f"ns.{zone_name}."
+    # Добавим обязательные A-записи
+    for name in ('@', 'ns'):
+        if name not in added_names:
+            records.append({'name': name, 'type': 'A', 'value': default_ip})
+            added_names.add(name)
 
-    # Создание директории
+    ns_ptr_octet = default_ip.split('.')[-1]
+    ptr_records[ns_ptr_octet] = f"ns.{zone_name}."
+    unique_ips.add(default_ip)
+
+    # Генерация файлов
     zone_dir = os.path.join('zones', zone_name)
     os.makedirs(zone_dir, exist_ok=True)
 
-    # Генерация основной зоны
     zone_template = env.get_template('zone.j2')
     with open(os.path.join(zone_dir, 'db.zone'), 'w') as f:
         f.write(zone_template.render(
@@ -72,9 +92,8 @@ def main():
             default_ip=default_ip
         ))
 
-    # Генерация обратной зоны
     reverse_template = env.get_template('reverse.j2')
-    reverse_zone_name = reverse_ip(default_ip) if len(unique_ips) == 1 else reverse_ip('.'.join(default_ip.split('.')[:3]) + '.0')
+    reverse_base = default_ip if len(unique_ips) == 1 else '.'.join(default_ip.split('.')[:3]) + '.0'
     with open(os.path.join(zone_dir, 'db.reverse'), 'w') as f:
         f.write(reverse_template.render(
             zones_name=zone_name,
