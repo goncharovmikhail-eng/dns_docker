@@ -25,7 +25,7 @@ options {
 
 logging {  
         channel default_debug {  
-                file "{{ dns_logs }}";
+                file "/var/named/logs/named.log";
                 severity info;   
                 print-time yes;  
         }; 

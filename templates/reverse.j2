@@ -1,0 +1,13 @@
+$TTL    86400
+@       IN      SOA     ns.{{ zones_name }}. admin.{{ zones_name }}. (
+                        2025061101 ; Serial
+                        3600       ; Refresh
+                        1800       ; Retry
+                        1209600    ; Expire
+                        86400 )    ; Negative Cache TTL
+
+@       IN      NS      ns.{{ zones_name }}.
+
+{% for octet, name in ptr_records.items() %}
+{{ octet }}    IN      PTR     {{ name }}
+{% endfor %}

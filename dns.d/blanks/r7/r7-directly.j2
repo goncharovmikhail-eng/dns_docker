@@ -1,0 +1,28 @@
+@       IN      NS      ns.{{ zone_name }}.
+ns      IN      A       {{ default_ip }}
+
+; A Records
+@       IN      A       {{ default_ip }}
+ns      IN      A       {{ default_ip }}
+mail    IN      A       {{ mail_ip }}
+admin     IN      A     {{ default_ip }}
+calendar     IN      A     {{ default_ip }}
+contacts     IN      A     {{ default_ip }}
+disk     IN      A     {{ default_ip }}
+projects     IN      A     {{ default_ip }}
+
+ds IN A {{ ds_ip }}
+search IN A {{ searsh_ip }}
+
+; MX Records
+@       IN      MX      10 mail.{{ zone_name }}.
+
+; CNAME Records
+
+; TXT Records
+@           IN      TXT     "v=spf1 +mx ~all"
+_dmarc      IN      TXT     "v=DMARC1;p=none;rua=mailto:dmarc@{{ zone_name }}"
+dkim._domainkey IN TXT  ( "v=DKIM1; k=rsa; "
+                          "p=" )
+
+

@@ -6,3 +6,5 @@ services:
       - "1053:53/udp"
       - "1053:53/tcp"
     privileged: true
+    volumes:
+      - ./logs:/var/named/logs
