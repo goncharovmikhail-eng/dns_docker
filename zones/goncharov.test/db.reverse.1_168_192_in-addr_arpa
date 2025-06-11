@@ -1,5 +1,5 @@
 $TTL 86400
-@       IN      SOA     ns.{{ zones_name }}. admin.{{ zones_name }}. (
+@       IN      SOA     ns.goncharov.test. admin.goncharov.test. (
                       2025061101 ; Serial
                       604800      ; Refresh
                       86400       ; Retry
@@ -7,10 +7,9 @@ $TTL 86400
                       604800 )    ; Negative Cache TTL
 
 ; NS
-@       IN      NS      ns.{{ zones_name }}.
+@       IN      NS      ns.goncharov.test.
 
 ; PTR records
-{% for octet, fqdn in ptr_records %}
-{{ octet }}    IN      PTR     {{ fqdn }}
-{% endfor %}
+
+1    IN      PTR     ns.goncharov.test.
 

@@ -1,0 +1,40 @@
+$TTL 86400
+@       IN      SOA     ns.goncharov.test. admin.goncharov.test. (
+                        2025061101 ; Serial
+                        3600       ; Refresh
+                        1800       ; Retry
+                        1209600    ; Expire
+                        86400 )    ; Negative Cache TTL
+
+; NS
+@   IN  NS  ns.goncharov.test
+ns  IN  A   192.168.1.1
+
+; A records
+
+mail      IN      A       192.168.1.1
+
+admin      IN      A       192.168.1.1
+
+ds      IN      A       192.168.1.1
+
+search      IN      A       192.168.1.1
+
+@      IN      A       192.168.1.1
+
+ns      IN      A       192.168.1.1
+
+
+; MX records
+
+@      IN      MX      10 mail.goncharov.test.
+
+
+; TXT records
+
+@      IN      TXT     "v=spf1 +mx ~all"
+
+_dmarc      IN      TXT     "v=DMARC1;p=none;rua=mailto:dmarc@goncharov.test"
+
+dkim._domainkey      IN      TXT     "v=DKIM1; k=rsa; p="
+
