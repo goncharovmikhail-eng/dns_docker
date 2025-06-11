@@ -1,0 +1,20 @@
+zones:
+  - zone_name: r7.local
+    default_ip: 192.168.1.31
+    template: r7
+
+    mail:
+      enabled: true
+      subdomain: mail
+      dkim_public_key: "ABCD123..."
+
+    records:
+      - name: www
+        type: A
+        ip: 192.168.1.31
+      - name: admin
+        type: A
+        ip: 192.168.1.31
+      - name: search
+        type: A
+        ip: 192.168.1.50

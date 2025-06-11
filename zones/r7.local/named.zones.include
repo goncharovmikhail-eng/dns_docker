@@ -1,0 +1,10 @@
+
+zone "r7.local" IN {
+    type master;
+    file "zones/r7.local/db.zone";
+};
+
+zone "31.1.168.192.in-addr.arpa" IN {
+    type master;
+    file "zones/r7.local/db.reverse";
+};

@@ -1,0 +1,10 @@
+
+zone "goncharov.stage" IN {
+    type master;
+    file "/var/named/goncharov.stage/db.zone";
+};
+
+zone "248.1.168.192.in-addr.arpa" IN {
+    type master;
+    file "/var/named/goncharov.stage/db.reverse";
+};

@@ -10,15 +10,20 @@ def ask(msg, default=None):
     val = input(f"{msg}{suffix}: ").strip()
     return val if val else default
 
-def reverse_ip(ip):
-    return '.'.join(reversed(ip.split('.'))) + '.in-addr.arpa'
+def get_reverse_zone_name(ips: set[str]) -> str:
+    """Определяет имя зоны для обратного разрешения."""
+    if len(ips) == 1:
+        return ipaddress.IPv4Address(list(ips)[0]).reverse_pointer
+    else:
+        net = ipaddress.IPv4Network(list(ips)[0] + '/24', strict=False)
+        return '.'.join(reversed(str(net.network_address).split('.')[:3])) + '.in-addr.arpa'
 
 def main():
     zone_name = ask("Введите имя зоны (example.com)")
     default_ip = ask("Введите IP по умолчанию", "192.168.1.1")
 
     records = []
-    ptr_records = {}
+    ptr_records = defaultdict(str)
     unique_ips = set()
     added_names = set()
 
@@ -32,17 +37,14 @@ def main():
             records.append({'name': mail_sub, 'type': 'A', 'value': default_ip})
             added_names.add(mail_sub)
 
-        records.append({'name': '@', 'type': 'MX', 'value': f"10 {mail_sub}.{zone_name}."})
-        records.append({'name': '@', 'type': 'TXT', 'value': '"v=spf1 +mx ~all"'})
-        records.append({'name': '_dmarc', 'type': 'TXT', 'value': f'"v=DMARC1;p=none;rua=mailto:dmarc@{zone_name}"'})
-        records.append({
-            'name': 'dkim._domainkey',
-            'type': 'TXT',
-            'value': f'"v=DKIM1; k=rsa; p={dkim_key}"' if dkim_key else '"v=DKIM1; k=rsa; p="'
-        })
+        records.extend([
+            {'name': '@', 'type': 'MX', 'value': f"10 {mail_sub}.{zone_name}."},
+            {'name': '@', 'type': 'TXT', 'value': '"v=spf1 +mx ~all"'},
+            {'name': '_dmarc', 'type': 'TXT', 'value': f'"v=DMARC1;p=none;rua=mailto:dmarc@{zone_name}"'},
+            {'name': 'dkim._domainkey', 'type': 'TXT', 'value': f'"v=DKIM1; k=rsa; p={dkim_key}"' if dkim_key else '"v=DKIM1; k=rsa; p="'}
+        ])
 
-        ptr_octet = default_ip.split('.')[-1]
-        ptr_records[ptr_octet] = f"{mail_sub}.{zone_name}."
+        ptr_records[default_ip.split('.')[-1]] = f"{mail_sub}.{zone_name}."
         unique_ips.add(default_ip)
 
     # Поддомены
@@ -70,37 +72,52 @@ def main():
         unique_ips.add(ip)
         ptr_records[ip.split('.')[-1]] = f"{name}.{zone_name}."
 
-    # Добавим обязательные A-записи
+    # Обязательные записи
     for name in ('@', 'ns'):
         if name not in added_names:
             records.append({'name': name, 'type': 'A', 'value': default_ip})
             added_names.add(name)
-
-    ns_ptr_octet = default_ip.split('.')[-1]
-    ptr_records[ns_ptr_octet] = f"ns.{zone_name}."
+    ptr_records[default_ip.split('.')[-1]] = f"ns.{zone_name}."
     unique_ips.add(default_ip)
 
-    # Генерация файлов
+    # Директория зоны
     zone_dir = os.path.join('zones', zone_name)
     os.makedirs(zone_dir, exist_ok=True)
 
-    zone_template = env.get_template('zone.j2')
+    # Прямая зона
     with open(os.path.join(zone_dir, 'db.zone'), 'w') as f:
-        f.write(zone_template.render(
+        f.write(env.get_template('zone.j2').render(
             zone_name=zone_name,
             records=records,
             default_ip=default_ip
         ))
 
-    reverse_template = env.get_template('reverse.j2')
-    reverse_base = default_ip if len(unique_ips) == 1 else '.'.join(default_ip.split('.')[:3]) + '.0'
+    # Обратная зона
+    reverse_zone_name = get_reverse_zone_name(unique_ips)
     with open(os.path.join(zone_dir, 'db.reverse'), 'w') as f:
-        f.write(reverse_template.render(
+        f.write(env.get_template('reverse.j2').render(
             zones_name=zone_name,
             ptr_records=sorted(ptr_records.items(), key=lambda x: int(x[0]))
         ))
 
+    # Файл include-записи
+    named_include_path = os.path.join(zone_dir, 'named.zones.include')
+    with open(named_include_path, 'w') as f:
+        f.write(f'''
+zone "{zone_name}" IN {{
+    type master;
+    file "/var/named/{zone_name}/db.zone";
+}};
+
+zone "{reverse_zone_name}" IN {{
+    type master;
+    file "/var/named/{zone_name}/db.reverse";
+}};
+''')
+
     print(f"\n✅ Зона создана в директории: zones/{zone_name}/")
+    print(f"📎 Файл для include в named.conf: {named_include_path}")
 
 if __name__ == "__main__":
     main()
+
