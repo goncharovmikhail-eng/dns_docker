@@ -1,0 +1,50 @@
+$TTL 86400
+@       IN      SOA     ns.goncharov.stage. admin.goncharov.stage. (
+                        2025061101 ; Serial
+                        3600       ; Refresh
+                        1800       ; Retry
+                        1209600    ; Expire
+                        86400 )    ; Negative Cache TTL
+
+; NS
+@   IN  NS  ns.goncharov.stage
+ns  IN  A   192.168.1.248
+
+; A records
+
+mail      IN      A       192.168.1.248
+
+mail      IN      A       192.168.1.248
+
+admin      IN      A       192.168.1.248
+
+calendar      IN      A       192.168.1.248
+
+contacts      IN      A       192.168.1.248
+
+disk      IN      A       192.168.1.248
+
+projects      IN      A       192.168.1.248
+
+ds      IN      A       192.168.1.248
+
+search      IN      A       192.168.1.248
+
+@      IN      A       192.168.1.248
+
+ns      IN      A       192.168.1.248
+
+
+; MX records
+
+@      IN      MX      10 mail.goncharov.stage.
+
+
+; TXT records
+
+@      IN      TXT     "v=spf1 +mx ~all"
+
+_dmarc      IN      TXT     "v=DMARC1;p=none;rua=mailto:dmarc@goncharov.stage"
+
+dkim._domainkey      IN      TXT     "v=DKIM1; k=rsa; p="
+
