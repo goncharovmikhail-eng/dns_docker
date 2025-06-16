@@ -1,42 +1,18 @@
-param.ru:
-  default_ip: 192.168.1.85
+craft.tech:
+  default_ip: 192.168.1.127
   records:
-  - name: mail
+  - name: zabbix
     type: A
-    value: 192.168.1.85
-  - name: '@'
-    type: MX
-    value: 10 mail.param.ru.
-  - name: '@'
-    type: TXT
-    value: '"v=spf1 +mx ~all"'
-  - name: _dmarc
-    type: TXT
-    value: '"v=DMARC1;p=none;rua=mailto:dmarc@param.ru"'
-  - name: dkim._domainkey
-    type: TXT
-    value: '"v=DKIM1; k=rsa; p="'
-  - name: admin
+    value: 192.168.1.127
+  - name: cacti
     type: A
-    value: 192.168.1.85
-  - name: ds
-    type: A
-    value: 192.168.1.85
-  - name: ks
-    type: A
-    value: 192.168.1.85
-  - name: kill
-    type: A
-    value: 192.168.1.85
-  - name: test
-    type: A
-    value: 192.168.1.85
+    value: 192.168.1.127
   - name: '@'
     type: A
-    value: 192.168.1.85
+    value: 192.168.1.127
   - name: ns
     type: A
-    value: 192.168.1.85
-  reverse_zone: 85.1.168.192.in-addr.arpa
+    value: 192.168.1.127
+  reverse_zone: 127.1.168.192.in-addr.arpa
   ptr:
-    '85': ns.param.ru.
+    '127': ns.craft.tech.

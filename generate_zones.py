@@ -2,6 +2,7 @@ import os
 import ipaddress
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
+from typing import Set
 
 env = Environment(loader=FileSystemLoader('templates'))
 
@@ -10,7 +11,7 @@ def ask(msg, default=None):
     val = input(f"{msg}{suffix}: ").strip()
     return val if val else default
 
-def get_reverse_zone_name(ips: set[str]) -> str:
+def get_reverse_zone_name(ips: Set[str]) -> str:
     """Определяет имя зоны для обратного разрешения."""
     if len(ips) == 1:
         return ipaddress.IPv4Address(list(ips)[0]).reverse_pointer
@@ -24,8 +25,8 @@ def main():
 
     records = []
     ptr_records = defaultdict(str)
-    unique_ips = set()
-    added_names = set()
+    unique_ips = Set()
+    added_names = Set()
 
     # Почта
     mail_enabled = ask("Нужна ли почта? (y/n)", "n").lower() == 'y'
@@ -106,12 +107,12 @@ def main():
         f.write(f'''
 zone "{zone_name}" IN {{
     type master;
-    file "/var/named/{zone_name}/db.zone";
+    file "/var/named/zones/{zone_name}/db.zone";
 }};
 
 zone "{reverse_zone_name}" IN {{
     type master;
-    file "/var/named/{zone_name}/db.reverse";
+    file "/var/named/zones/{zone_name}/db.reverse";
 }};
 ''')
 

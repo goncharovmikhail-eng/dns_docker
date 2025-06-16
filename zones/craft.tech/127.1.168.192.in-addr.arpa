@@ -1,5 +1,5 @@
 $TTL 86400
-@       IN      SOA     ns.{{ zones_name }}. admin.{{ zones_name }}. (
+@       IN      SOA     ns.craft.tech. admin.craft.tech. (
                       2025061101 ; Serial
                       604800      ; Refresh
                       86400       ; Retry
@@ -7,12 +7,11 @@ $TTL 86400
                       604800 )    ; Negative Cache TTL
 
 ; NS
-@       IN      NS      ns.{{ zones_name }}.
+@       IN      NS      ns.craft.tech.
 
 ; A record for NS (важно, чтобы не ругался)
-ns.{{ zones_name }}.    IN    A    {{ default_ip }}
+ns.craft.tech.    IN    A    192.168.1.127
 
 ; PTR records
-{% for octet, fqdn in ptr_records %}
-{{ octet }}    IN      PTR     {{ fqdn }}
-{% endfor %}
+
+127    IN      PTR     ns.craft.tech.

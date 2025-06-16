@@ -3,6 +3,7 @@ import ipaddress
 import yaml
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
+from typing import Set
 
 env = Environment(loader=FileSystemLoader('templates'))
 
@@ -13,7 +14,7 @@ def ask(msg, default=None):
     val = input(f"{msg}{suffix}: ").strip()
     return val if val else default
 
-def get_reverse_zone_name(ips: set[str]) -> str:
+def get_reverse_zone_name(ips: Set[str]) -> str:
     if len(ips) == 1:
         return ipaddress.IPv4Address(list(ips)[0]).reverse_pointer
     else:

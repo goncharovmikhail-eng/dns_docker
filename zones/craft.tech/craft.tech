@@ -1,5 +1,5 @@
 $TTL 86400
-@       IN      SOA     ns.еуtest.test. admin.еуtest.test. (
+@       IN      SOA     ns.craft.tech. admin.craft.tech. (
                         2025061101 ; Serial
                         3600       ; Refresh
                         1800       ; Retry
@@ -7,16 +7,18 @@ $TTL 86400
                         86400 )    ; Negative Cache TTL
 
 ; NS
-@   IN  NS  ns.еуtest.test
-ns  IN  A   192.168.1.1
+@   IN  NS  ns.craft.tech.
+ns  IN  A   192.168.1.127
 
 ; A records
 
-admin      IN      A       192.168.1.1
+zabbix      IN      A       192.168.1.127
 
-@      IN      A       192.168.1.1
+cacti      IN      A       192.168.1.127
 
-ns      IN      A       192.168.1.1
+@      IN      A       192.168.1.127
+
+ns      IN      A       192.168.1.127
 
 
 ; MX records
