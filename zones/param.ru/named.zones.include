@@ -1,4 +1,3 @@
-
 zone "param.ru" IN {
     type master;
     file "/var/named/param.ru/db.zone";
