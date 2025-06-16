@@ -1,0 +1,10 @@
+
+zone "param.ru" IN {
+    type master;
+    file "/var/named/param.ru/db.zone";
+};
+
+zone "85.1.168.192.in-addr.arpa" IN {
+    type master;
+    file "/var/named/param.ru/db.reverse";
+};
