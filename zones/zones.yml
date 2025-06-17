@@ -16,3 +16,39 @@ craft.tech:
   reverse_zone: 127.1.168.192.in-addr.arpa
   ptr:
     '127': ns.craft.tech.
+test.test:
+  default_ip: 192.168.1.1
+  records:
+  - name: mail
+    type: A
+    value: 192.168.1.1
+  - name: '@'
+    type: MX
+    value: 10 mail.test.test.
+  - name: '@'
+    type: TXT
+    value: '"v=spf1 +mx ~all"'
+  - name: _dmarc
+    type: TXT
+    value: '"v=DMARC1;p=none;rua=mailto:dmarc@test.test"'
+  - name: dkim._domainkey
+    type: TXT
+    value: '"v=DKIM1; k=rsa; p="'
+  - name: admin
+    type: A
+    value: 192.168.1.1
+  - name: ds
+    type: A
+    value: 192.168.1.1
+  - name: kill
+    type: A
+    value: 192.168.1.1
+  - name: '@'
+    type: A
+    value: 192.168.1.1
+  - name: ns
+    type: A
+    value: 192.168.1.1
+  reverse_zone: 1.1.168.192.in-addr.arpa
+  ptr:
+    '1': ns.test.test.
