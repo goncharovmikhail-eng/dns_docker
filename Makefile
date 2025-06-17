@@ -31,6 +31,7 @@ build:
 	python3 generate_named_conf.py
 
 	@echo "[2] Сборка и запуск контейнеров..."
+	docker compose down 2>/dev/null || true
 	docker compose build
 	docker compose up -d
 git:
