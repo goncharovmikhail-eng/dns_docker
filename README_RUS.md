@@ -10,8 +10,19 @@ zones/zones.yml можно добавлять и руками в том числ
   - Docker version 25.0.7
   - Docker Compose version v2.27.1 
   - Python от 3.8.20
-
+  - make
 DNS сервер запускается в docker контейнере на базе fedora. 
+
+## Рекомендации
+  - Проиграйте ansible role перед использованием "docker_node_install"
+
+```bash
+git clone git@github.com:goncharovmikhail-eng/docker_node_install.git
+```
+
+```bash
+git clone https://github.com/goncharovmikhail-eng/docker_node_install.git
+```
 
 ## Используйте make для комфортного испозования:
 
