@@ -1,0 +1,27 @@
+$TTL 86400
+@       IN      SOA     ns.{{ zone_name }}. admin.{{ zone_name }}. (
+                        2025061101 ; Serial
+                        3600       ; Refresh
+                        1800       ; Retry
+                        1209600    ; Expire
+                        86400 )    ; Negative Cache TTL
+
+; NS
+@   IN  NS  ns.{{ zone_name }}.
+ns  IN  A   {{ default_ip }}
+
+; A records
+{% for record in records if record.type == 'A' %}
+{{ record.name }}      IN      A       {{ record.value }}
+{% endfor %}
+
+; MX records
+{% for record in records if record.type == 'MX' %}
+{{ record.name }}      IN      MX      {{ record.value }}
+{% endfor %}
+
+; TXT records
+{% for record in records if record.type == 'TXT' %}
+{{ record.name }}      IN      TXT     {{ record.value }}
+{% endfor %}
+

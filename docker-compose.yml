@@ -1,8 +1,14 @@
 services:
   dns:
-    image: goncharovmikhail/dns:first
+    build: .
     container_name: dns
     ports:
-      - "1053:53/udp"
-      - "1053:53/tcp"
-    privileged: true
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./logs:/var/named/logs
+      - ./zones:/var/named/zones
+      - ./dns.d/named.conf:/etc/named.conf
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped

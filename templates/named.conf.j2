@@ -1,15 +1,15 @@
 options {  
-        listen-on port 53 { any; };  #  (публичный доступ)  
-        listen-on-v6 port 53 { any; };  
+        listen-on port 53 {{ listen }}; 
+        listen-on-v6 port 53 {{ listenv6 }};  
         directory       "/var/named";  
         dump-file       "/var/named/data/cache_dump.db";  
         statistics-file "/var/named/data/named_stats.txt";  
         memstatistics-file "/var/named/data/named_mem_stats.txt";  
         secroots-file   "/var/named/data/named.secroots";  
         recursing-file  "/var/named/data/named.recursing";  
-        allow-query     { any; };  # Разрешить запросы от всех  
+        allow-query     {{ listen }};   
 
-        recursion yes; 
+        recursion {{ recursion }}; 
 
         dnssec-validation yes;  
 
@@ -25,28 +25,21 @@ options {
 
 logging {  
         channel default_debug {  
-                file "{{ dns_logs }}";
+                file "/var/named/logs/named.log";
                 severity info;   
                 print-time yes;  
         }; 
 
 };  
 
-zone {{ zones_name }} {
-    type master;
-    file "{{ dns_redos_zones_path }}/db.{{ zones_name }}";
-};
-
-zone 248.1.168.192.in-addr.arpa {
-    type master;
-    file "{{ dns_redos_zones_path }}/db.{{ revers_name }}";
-};
-
-
 zone "." IN {  
         type hint;  
         file "named.ca";  
 };  
+
+{% for include in zone_includes %}
+{{ include }}
+{% endfor %}
 
 include "/etc/named.rfc1912.zones";  
 include "/etc/named.root.key";  

@@ -1,11 +1,14 @@
 FROM fedora
 
 RUN dnf -y update && \
-    dnf -y install named && \
+    dnf -y install bind bind-utils systemd && \
+    dnf clean all
 
-    mkdir -p /run/named /var/named && \
-    chown -R root:root /run/named /var/named && \
-    chmod -R 755 /run/named /var/named
+RUN mkdir -p /var/named/logs && \
+    chown -R named:named /var/named && chmod -R 777 /var/named
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-CMD ["/usr/sbin/named", "-g"]
+USER named 
+CMD ["/usr/sbin/named", "-g", "-c", "/etc/named.conf"]
