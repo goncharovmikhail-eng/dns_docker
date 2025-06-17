@@ -1,0 +1,3 @@
+dns.d/*
+zones/*
+!zones/zones.yml
