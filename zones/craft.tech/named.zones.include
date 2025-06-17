@@ -1,9 +1,0 @@
-zone "craft.tech" IN {
-    type master;
-    file "/var/named/craft.tech/craft.tech";
-};
-
-zone "127.1.168.192.in-addr.arpa" IN {
-    type master;
-    file "/var/named/craft.tech/127.1.168.192.in-addr.arpa";
-};
