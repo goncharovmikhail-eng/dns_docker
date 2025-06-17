@@ -4,6 +4,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
 from typing import Set
+import sys
 
 env = Environment(loader=FileSystemLoader('templates'))
 
@@ -119,4 +120,11 @@ def main():
     print(f"\n✅ Зона '{zone_name}' успешно добавлена в {ZONES_YAML_PATH}")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n❌ Прервано пользователем (Ctrl+C)", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Неожиданная ошибка: {e}", file=sys.stderr)
+        sys.exit(1)

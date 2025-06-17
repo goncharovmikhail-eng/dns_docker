@@ -24,7 +24,7 @@ zone_includes = []
 for zone_name in os.listdir(zones_dir):
     zone_path = os.path.join(zones_dir, zone_name)
     include_file = os.path.join(zone_path, 'named.zones.include')
-    
+
     if os.path.isdir(zone_path) and os.path.isfile(include_file):
         # Абсолютный путь к файлу в BIND окружении
         bind_zone_include_path = f'/var/named/zones/{zone_name}/named.zones.include'
