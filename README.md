@@ -40,12 +40,13 @@ make all
 7. Push changes to the develop branch. If it does not exist, it will be created.
 
 ```bash
-make clean```
+make clean
+```
 
 ### Description
 - Removes all generated configs in zones/* but keeps the zones/zones.yml file intact.
 
-###command to enter container
+### Command to enter container
 
 ```bash
 docker exec -it dns /bin/bash
