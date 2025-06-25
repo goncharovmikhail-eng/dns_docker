@@ -2,6 +2,7 @@ services:
   dns:
     build: .
     container_name: dns
+    user: root
     ports:
       - "53:53/udp"
       - "53:53/tcp"
@@ -11,4 +12,4 @@ services:
       - ./dns.d/named.conf:/etc/named.conf
     cap_add:
       - NET_ADMIN
-    restart: unless-stopped
+    privileged: true
